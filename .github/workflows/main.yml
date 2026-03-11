@@ -1,0 +1,31 @@
+name: Daily 8 Commits
+
+on:
+  schedule:
+    # Bu har kuni soat 00:00 da ishga tushadi (UTC vaqti bilan)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Bu tugma orqali o'zingiz ham ishlatib ko'rishingiz uchun
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Make 8 commits
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          for i in {1..8}
+          do
+            echo "Commit number $i on $(date)" >> developer_log.txt
+            git add developer_log.txt
+            git commit -m "Developer update: step $i"
+          done
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
